@@ -81,6 +81,8 @@ USHighYield_test = Y_USHighYield[(Y_USHighYield.index > '2016-01-01') & (Y_USHig
 
 #ABS
 #Sort data
+all_train = all_train.sort_index()
+all_test = all_test.sort_index()
 ABS_train = ABS_train.sort_index()
 ABS_test = ABS_test.sort_index()
 
@@ -120,26 +122,32 @@ topten_ABS_all_test.shape
 
 all_train = all_train.reset_index()
 all_train = all_train.drop('Value Date', axis=1)
+
+all_test = all_test.reset_index()
+all_test = all_test.drop('Value Date', axis=1)
 import pandas as pd
 from sklearn import linear_model
 
 model_ols = linear_model.LinearRegression()
-window=12
+window=2
 
 for iStart in range(0, len(all_train)-window):        
     iEnd = iStart+window
 
     model_ols.fit(all_train[iStart:iEnd], ABS_train[iStart:iEnd])
-        
-    #Predict
-    pred_nextyr = iEnd + window
-    pred_forward = pred_nextyr
-    model_ols.predict(all_train[pred_nextyr:pred_forward])
 
-    #store output
+    #write/store output
     print(iEnd)
     print(model_ols.coef_)
 
-
-#Rolling Section End
-############################
+    #Predict
+    pred_nextyr = iEnd + window
+    pred_forward = pred_nextyr
+    #model_ols.predict(all_train[pred_nextyr:pred_forward])
+    
+for iStart in range(0, len(all_test)-window):        
+    iEnd = iStart+window
+    lm_preds = model_ols.predict(all_test[iStart:iEnd])
+    print(iStart,iEnd)
+    print(lm_preds[1])
+    
